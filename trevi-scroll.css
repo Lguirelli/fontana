@@ -1,0 +1,138 @@
+/* Fontana di Trevi — vídeo em 24 fps controlado pelo scroll */
+.trevi-scroll {
+  position: relative;
+  min-height: 560vh;
+  background: #080807;
+  color: #fff;
+  overflow: clip;
+}
+
+.trevi-scroll__video {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100vh;
+  object-fit: cover;
+  background: #080807;
+}
+
+.trevi-scroll__shade {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,.76), rgba(0,0,0,.28) 48%, rgba(0,0,0,.62)),
+    linear-gradient(180deg, rgba(0,0,0,.42), rgba(0,0,0,.12) 38%, rgba(0,0,0,.76));
+}
+
+.trevi-scroll__content {
+  position: relative;
+  z-index: 2;
+  margin-top: -100vh;
+}
+
+.trevi-panel {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(720px, calc(100% - 40px));
+  margin-left: clamp(20px, 8vw, 120px);
+  padding: 96px 0;
+}
+
+.trevi-panel--hero {
+  min-height: 120vh;
+}
+
+.trevi-eyebrow {
+  margin: 0 0 16px;
+  font-size: .82rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.78);
+}
+
+.trevi-panel h1,
+.trevi-panel h2 {
+  margin: 0 0 24px;
+  max-width: 760px;
+  font-size: clamp(2.4rem, 6vw, 5.8rem);
+  line-height: .95;
+  letter-spacing: -.05em;
+}
+
+.trevi-panel h2 {
+  font-size: clamp(2rem, 4.6vw, 4.4rem);
+}
+
+.trevi-panel p {
+  max-width: 620px;
+  margin: 0;
+  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  line-height: 1.65;
+  color: rgba(255,255,255,.86);
+}
+
+.trevi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.trevi-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 1px solid rgba(255,255,255,.3);
+  border-radius: 999px;
+  background: rgba(255,255,255,.92);
+  color: #111;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.trevi-button--ghost {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+
+@media (max-width: 768px) {
+  .trevi-scroll {
+    min-height: 500vh;
+  }
+
+  .trevi-scroll__shade {
+    background: linear-gradient(180deg, rgba(0,0,0,.44), rgba(0,0,0,.32), rgba(0,0,0,.78));
+  }
+
+  .trevi-panel {
+    width: min(100% - 32px, 560px);
+    margin-inline: auto;
+    justify-content: flex-end;
+    padding-bottom: 88px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trevi-scroll {
+    min-height: auto;
+  }
+
+  .trevi-scroll__video {
+    position: relative;
+  }
+
+  .trevi-panel,
+  .trevi-panel--hero {
+    min-height: auto;
+    padding-block: 72px;
+  }
+}
