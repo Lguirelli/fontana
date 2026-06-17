@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const section = document.querySelector(".scroll-hero");
   const video = document.querySelector("#treviScrollVideo");
 
-  if (!section || !video) return;
+  if (!video) return;
 
   const FPS = 24;
   let duration = 0;
@@ -16,20 +15,27 @@ document.addEventListener("DOMContentLoaded", () => {
     return Math.min(Math.max(value, min), max);
   }
 
-  function updateVideoByScroll() {
+  function getPageScrollProgress() {
+    const doc = document.documentElement;
+    const scrollTop = window.scrollY || doc.scrollTop || 0;
+    const maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
+
+    return clamp(scrollTop / maxScroll, 0, 1);
+  }
+
+  function updateVideoByPageScroll() {
     if (!duration || Number.isNaN(duration)) return;
 
-    const rect = section.getBoundingClientRect();
-    const scrollable = section.offsetHeight - window.innerHeight;
-    const progress = clamp(-rect.top / scrollable, 0, 1);
+    const progress = getPageScrollProgress();
     const rawTime = progress * duration;
     const frameTime = Math.round(rawTime * FPS) / FPS;
+    const safeTime = clamp(frameTime, 0, Math.max(duration - 0.001, 0));
 
-    if (Math.abs(video.currentTime - frameTime) > 0.015) {
+    if (Math.abs(video.currentTime - safeTime) > 0.015) {
       try {
-        video.currentTime = frameTime;
+        video.currentTime = safeTime;
       } catch (error) {
-        console.warn("Não foi possível sincronizar o vídeo com o scroll.", error);
+        console.warn("Não foi possível sincronizar o vídeo com o scroll da página.", error);
       }
     }
   }
@@ -39,14 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     ticking = true;
     window.requestAnimationFrame(() => {
-      updateVideoByScroll();
+      updateVideoByPageScroll();
       ticking = false;
     });
   }
 
   function onMetadataLoaded() {
     duration = video.duration;
-    updateVideoByScroll();
+    updateVideoByPageScroll();
   }
 
   if (video.readyState >= 1) {
@@ -55,9 +61,10 @@ document.addEventListener("DOMContentLoaded", () => {
     video.addEventListener("loadedmetadata", onMetadataLoaded, { once: true });
   }
 
-  video.addEventListener("canplay", updateVideoByScroll, { once: true });
+  video.addEventListener("canplay", updateVideoByPageScroll, { once: true });
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
+  window.addEventListener("load", requestUpdate);
 
   video.load();
 });
