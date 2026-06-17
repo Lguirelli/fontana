@@ -1,74 +1,157 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Fontana di Trevi Serra Negra</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Conheça a Fontana di Trevi de Serra Negra, uma réplica monumental inspirada em Roma e um dos pontos turísticos mais fotogênicos do Circuito das Águas Paulista." />
+  <title>Fontana di Trevi de Serra Negra</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
-
 <body>
-
-<canvas id="bg"></canvas>
-
-<div class="page">
-
-<section class="hero reveal">
-  <div class="num">01</div>
-  <div class="hero-content">
-    <h1>Fontana di Trevi de Serra Negra</h1>
-    <p>Um pedacinho de Roma no interior paulista. Uma réplica monumental e fotogênica.</p>
-    <div class="actions">
-      <button class="btn">Conheça a atração</button>
-      <button class="btn ghost">Como chegar</button>
-    </div>
+  <div class="frame-stage" aria-hidden="true">
+    <canvas id="treviFrameCanvas" class="frame-canvas"></canvas>
   </div>
-</section>
+  <div class="page-overlay" aria-hidden="true"></div>
 
-<section class="section reveal">
-  <div class="num">02</div>
-  <div class="content">
-    <h2>Uma réplica inspirada em Roma</h2>
-    <p>Estrutura criada para valorizar o turismo local e cultura italiana.</p>
-  </div>
-</section>
+  <main>
+    <section class="section hero" id="inicio" aria-label="Apresentação da Fontana di Trevi de Serra Negra">
+      <div class="container hero-inner numbered-section no-line">
+        <span class="eyebrow reveal-item">Serra Negra, São Paulo</span>
+        <h1 class="reveal-item">Fontana di Trevi de Serra Negra</h1>
+        <p class="hero-lead reveal-item">
+          Um pedacinho de Roma no interior paulista. Uma réplica monumental, fotogênica e cheia de charme no coração turístico da cidade.
+        </p>
+        <div class="hero-actions reveal-item">
+          <a class="button primary" href="#sobre">Conheça a atração</a>
+          <a class="button ghost" href="#localizacao">Como chegar</a>
+        </div>
+      </div>
+    </section>
 
-<section class="section reveal">
-  <div class="num">03</div>
-  <div class="content">
-    <h2>Detalhes que impressionam</h2>
-    <p class="mono">370 m² · 11 m · 20,70 m · 14 esculturas · 40%</p>
-  </div>
-</section>
+    <section class="section content-section" id="sobre">
+      <div class="container split numbered-section">
+        <div class="section-number reveal-item">01</div>
+        <div class="section-heading">
+          <span class="section-kicker reveal-item">Sobre a atração</span>
+          <h2 class="reveal-item">Uma réplica monumental inspirada em Roma</h2>
+        </div>
+        <div class="text-stack">
+          <p class="reveal-item">
+            A Fontana di Trevi de Serra Negra foi criada para valorizar o turismo local e homenagear a presença da cultura italiana na história da cidade.
+          </p>
+          <p class="reveal-item">
+            A obra reproduz a estética clássica da fonte original de Roma, trazendo para o interior paulista uma experiência visual marcante e acessível para moradores e visitantes.
+          </p>
+        </div>
+      </div>
+    </section>
 
-<section class="section reveal">
-  <div class="num">04</div>
-  <div class="content">
-    <h2>Ponto turístico único</h2>
-    <p>Experiência visual no centro da cidade.</p>
-  </div>
-</section>
+    <section class="section content-section" id="destaques">
+      <div class="container numbered-section">
+        <div class="section-number reveal-item">02</div>
+        <span class="section-kicker reveal-item">Destaques</span>
+        <h2 class="reveal-item">Por que visitar a Fontana di Trevi de Serra Negra?</h2>
+        <div class="line-grid highlights-grid">
+          <article class="text-line reveal-item">
+            <h3>Maior réplica do mundo</h3>
+            <p>A atração é apresentada como a maior réplica da Fontana di Trevi, com cerca de 40% do tamanho da fonte original.</p>
+          </article>
+          <article class="text-line reveal-item">
+            <h3>Localização central</h3>
+            <p>Fica próxima à Praça João Zelante, à Fonte dos Italianos e a outros pontos de circulação turística.</p>
+          </article>
+          <article class="text-line reveal-item">
+            <h3>Cenário perfeito para fotos</h3>
+            <p>A fachada monumental, as esculturas, o espelho d’água e a iluminação tornam o local muito fotogênico.</p>
+          </article>
+          <article class="text-line reveal-item">
+            <h3>Experiência noturna</h3>
+            <p>À noite, a iluminação valoriza os detalhes da obra e cria um clima especial para visitantes.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-<section class="section reveal">
-  <div class="num">05</div>
-  <div class="content">
-    <h2>Onde fica</h2>
-    <p>Centro de Serra Negra, próximo à Praça João Zelante.</p>
-  </div>
-</section>
+    <section class="section content-section" id="caracteristicas">
+      <div class="container numbered-section">
+        <div class="section-number reveal-item">03</div>
+        <span class="section-kicker reveal-item">Características</span>
+        <h2 class="reveal-item">Detalhes que impressionam</h2>
+        <div class="metrics-grid">
+          <div class="metric reveal-item"><strong>370&nbsp;m²</strong><span>Área aproximada</span></div>
+          <div class="metric reveal-item"><strong>11&nbsp;m</strong><span>Altura aproximada</span></div>
+          <div class="metric reveal-item"><strong>20,70&nbsp;m</strong><span>Largura da estrutura</span></div>
+          <div class="metric reveal-item"><strong>14</strong><span>Esculturas inspiradas na original</span></div>
+          <div class="metric reveal-item"><strong>40%</strong><span>Escala em relação à fonte romana</span></div>
+        </div>
+      </div>
+    </section>
 
-<section class="section reveal">
-  <div class="num">06</div>
-  <div class="content">
-    <h2>Mais que uma réplica</h2>
-    <p>Um símbolo turístico da cidade.</p>
-  </div>
-</section>
+    <section class="section content-section" id="experiencia">
+      <div class="container split numbered-section reverse-layout">
+        <div class="section-number reveal-item">04</div>
+        <div class="section-heading">
+          <span class="section-kicker reveal-item">Visitação</span>
+          <h2 class="reveal-item">Um ponto turístico fácil de conhecer</h2>
+        </div>
+        <div class="text-stack">
+          <p class="visual-note reveal-item">Um passeio rápido, bonito e memorável para incluir no roteiro pelo centro de Serra Negra.</p>
+          <p class="reveal-item">
+            Por estar em uma região central, o visitante pode conhecer o monumento durante um passeio pelo centro, combinar a visita com outros pontos turísticos e aproveitar o comércio local.
+          </p>
+          <p class="reveal-item">
+            O espaço também resgata o costume simbólico de jogar moedas e fazer pedidos, criando uma conexão direta com o imaginário da fonte italiana.
+          </p>
+        </div>
+      </div>
+    </section>
 
-</div>
+    <section class="section content-section" id="localizacao">
+      <div class="container split numbered-section">
+        <div class="section-number reveal-item">05</div>
+        <div class="section-heading">
+          <span class="section-kicker reveal-item">Localização</span>
+          <h2 class="reveal-item">Onde fica a Fontana di Trevi de Serra Negra?</h2>
+        </div>
+        <div class="text-stack location-list">
+          <p class="reveal-item">
+            A atração está localizada na região central de Serra Negra, próxima à Praça João Zelante e à Fonte dos Italianos. Por estar em uma área turística de fácil acesso, é uma parada prática para quem está passeando pela cidade.
+          </p>
+          <span class="reveal-item">Localização central</span>
+          <span class="reveal-item">Acesso fácil</span>
+          <span class="reveal-item">Próxima a outros pontos turísticos</span>
+          <span class="reveal-item">Ideal para roteiros curtos</span>
+          <a class="button map-button reveal-item" href="https://www.google.com/maps/search/?api=1&query=Fontana%20di%20Trevi%20Serra%20Negra" target="_blank" rel="noopener">Abrir no mapa</a>
+        </div>
+      </div>
+    </section>
 
-<script src="assets/js/script.js"></script>
+    <section class="section content-section closing" id="simbolo">
+      <div class="container split numbered-section reverse-layout">
+        <div class="section-number reveal-item">06</div>
+        <div class="section-heading">
+          <span class="section-kicker reveal-item">Serra Negra</span>
+          <h2 class="reveal-item">Mais do que uma réplica, um símbolo turístico</h2>
+        </div>
+        <div class="text-stack">
+          <p class="reveal-item">
+            A Fontana di Trevi de Serra Negra reforça a vocação turística da cidade e amplia sua conexão com a cultura italiana.
+          </p>
+          <p class="reveal-item">
+            O monumento se tornou um novo cartão-postal, fortalecendo a imagem de Serra Negra como destino acolhedor, bonito e preparado para receber visitantes.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer reveal-item">
+    <p>Landing page turística — Criado por Lorenzo Guirelli</p>
+  </footer>
+
+  <script src="assets/js/scroll-video.js"></script>
 </body>
 </html>

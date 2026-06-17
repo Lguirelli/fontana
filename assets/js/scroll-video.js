@@ -3,47 +3,74 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!canvas) return;
 
   const context = canvas.getContext("2d", { alpha: false });
+
   const FRAME_FOLDER = "frames fontana";
   const START_FRAME = 2000;
   const END_FRAME = 2336;
   const FRAME_COUNT = END_FRAME - START_FRAME + 1;
-  const CACHE_LIMIT = 18;
-  const PRELOAD_RADIUS = window.matchMedia("(max-width: 720px)").matches ? 1 : 2;
+  const CACHE_LIMIT = window.matchMedia("(max-width: 760px)").matches ? 16 : 28;
+  const PRELOAD_RADIUS = window.matchMedia("(max-width: 760px)").matches ? 1 : 2;
 
   let canvasWidth = 0;
   let canvasHeight = 0;
   let targetFrame = 0;
   let drawnFrame = -1;
-  let ticking = false;
+  let rafId = 0;
   let resizeTimer = 0;
 
   const cache = new Map();
   const requests = new Map();
 
-  function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+  const frameNumber = (index) => START_FRAME + index;
 
-  function frameNumber(index) {
-    return START_FRAME + index;
-  }
-
-  function encodedFrameUrl(index, variant = 0) {
+  function frameUrlCandidates(index) {
     const number = frameNumber(index);
-    if (variant === 0) {
-      return `${FRAME_FOLDER}/Sequ%23U00eancia%2001_${number}.jpg`;
-    }
-    return `${FRAME_FOLDER}/Sequ%C3%AAncia%2001_${number}.jpg`;
+    const filename = `Sequência 01_${number}.jpg`;
+    const raw = `${FRAME_FOLDER}/${filename}`;
+    const encoded = encodeURI(raw);
+
+    return [
+      raw,
+      encoded,
+      `${FRAME_FOLDER}/Sequ%C3%AAncia%2001_${number}.jpg`,
+      `${FRAME_FOLDER}/Sequência%2001_${number}.jpg`
+    ];
   }
 
   function trimCache() {
     if (cache.size <= CACHE_LIMIT) return;
 
-    const ordered = [...cache.keys()].sort((a, b) => Math.abs(b - targetFrame) - Math.abs(a - targetFrame));
+    const ordered = [...cache.keys()].sort(
+      (a, b) => Math.abs(b - targetFrame) - Math.abs(a - targetFrame)
+    );
+
     while (cache.size > CACHE_LIMIT && ordered.length) {
       const key = ordered.shift();
       if (key !== targetFrame && key !== drawnFrame) cache.delete(key);
     }
+  }
+
+  function tryLoad(urls, safeIndex, resolve, reject) {
+    const [url, ...rest] = urls;
+    if (!url) {
+      reject(new Error(`Frame não encontrado: ${frameNumber(safeIndex)}`));
+      return;
+    }
+
+    const image = new Image();
+    image.decoding = "async";
+    image.loading = "eager";
+
+    image.onload = () => {
+      cache.set(safeIndex, image);
+      requests.delete(safeIndex);
+      trimCache();
+      resolve(image);
+    };
+
+    image.onerror = () => tryLoad(rest, safeIndex, resolve, reject);
+    image.src = url;
   }
 
   function loadFrame(index) {
@@ -51,40 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (cache.has(safeIndex)) return Promise.resolve(cache.get(safeIndex));
     if (requests.has(safeIndex)) return requests.get(safeIndex);
 
-    const promise = new Promise((resolve, reject) => {
-      const image = new Image();
-      image.decoding = "async";
-      image.loading = "eager";
-
-      image.onload = () => {
-        cache.set(safeIndex, image);
-        requests.delete(safeIndex);
-        trimCache();
-        resolve(image);
-      };
-
-      image.onerror = () => {
-        const fallback = new Image();
-        fallback.decoding = "async";
-        fallback.loading = "eager";
-        fallback.onload = () => {
-          cache.set(safeIndex, fallback);
-          requests.delete(safeIndex);
-          trimCache();
-          resolve(fallback);
-        };
-        fallback.onerror = () => {
-          requests.delete(safeIndex);
-          reject(new Error(`Frame não encontrado: ${frameNumber(safeIndex)}`));
-        };
-        fallback.src = encodedFrameUrl(safeIndex, 1);
-      };
-
-      image.src = encodedFrameUrl(safeIndex, 0);
+    const request = new Promise((resolve, reject) => {
+      tryLoad(frameUrlCandidates(safeIndex), safeIndex, resolve, reject);
     });
 
-    requests.set(safeIndex, promise);
-    return promise;
+    requests.set(safeIndex, request);
+    return request;
   }
 
   function resizeCanvas() {
@@ -108,8 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getScrollProgress() {
     const html = document.documentElement;
-    const maxScroll = Math.max(html.scrollHeight - window.innerHeight, 1);
-    return clamp((window.scrollY || html.scrollTop || 0) / maxScroll, 0, 1);
+    const body = document.body;
+    const scrollTop = window.scrollY || html.scrollTop || body.scrollTop || 0;
+    const scrollHeight = Math.max(html.scrollHeight, body.scrollHeight);
+    const maxScroll = Math.max(scrollHeight - window.innerHeight, 1);
+    return clamp(scrollTop / maxScroll, 0, 1);
   }
 
   function getFrameFromScroll() {
@@ -124,12 +126,22 @@ document.addEventListener("DOMContentLoaded", () => {
     context.fillStyle = "#000000";
     context.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    const scale = Math.max(canvasWidth / image.naturalWidth, canvasHeight / image.naturalHeight);
-    const drawWidth = image.naturalWidth * scale;
-    const drawHeight = image.naturalHeight * scale;
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const canvasRatio = canvasWidth / canvasHeight;
+
+    let drawWidth;
+    let drawHeight;
+
+    if (imageRatio > canvasRatio) {
+      drawHeight = canvasHeight;
+      drawWidth = drawHeight * imageRatio;
+    } else {
+      drawWidth = canvasWidth;
+      drawHeight = drawWidth / imageRatio;
+    }
+
     const drawX = (canvasWidth - drawWidth) / 2;
     const drawY = (canvasHeight - drawHeight) / 2;
-
     context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
   }
 
@@ -140,19 +152,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function updateReveal() {
+    const trigger = window.innerHeight * 0.82;
+    const focusLine = window.innerHeight * 0.48;
+
+    document.querySelectorAll(".section, .site-footer").forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top < trigger) section.classList.add("is-visible");
+      const active = rect.top < focusLine && rect.bottom > window.innerHeight * 0.24;
+      section.classList.toggle("is-active", active);
+    });
+  }
+
   function render() {
-    ticking = false;
+    rafId = 0;
     targetFrame = getFrameFromScroll();
     preloadAround(targetFrame);
+    updateReveal();
 
     if (targetFrame === drawnFrame && cache.has(targetFrame)) return;
 
     loadFrame(targetFrame)
       .then((image) => {
-        if (targetFrame !== getFrameFromScroll()) {
+        const currentFrame = getFrameFromScroll();
+        if (targetFrame !== currentFrame) {
           requestRender();
           return;
         }
+
         drawCover(image);
         drawnFrame = targetFrame;
       })
@@ -160,9 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function requestRender() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(render);
+    if (rafId) return;
+    rafId = window.requestAnimationFrame(render);
   }
 
   function handleResize() {
@@ -170,41 +196,25 @@ document.addEventListener("DOMContentLoaded", () => {
     resizeTimer = window.setTimeout(() => {
       resizeCanvas();
       requestRender();
-    }, 80);
+    }, 70);
   }
 
-  function prepareRevealAnimations() {
-    const groups = document.querySelectorAll(".section, .site-footer");
-
-    document.querySelectorAll(".section").forEach((section) => {
-      section.querySelectorAll(".reveal-item").forEach((item, index) => {
-        item.style.setProperty("--reveal-delay", `${Math.min(index * 90, 540)}ms`);
-      });
+  document.querySelectorAll(".section").forEach((section) => {
+    section.querySelectorAll(".reveal-item").forEach((item, index) => {
+      item.style.setProperty("--reveal-delay", `${Math.min(index * 90, 540)}ms`);
     });
-
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("is-visible");
-      });
-    }, { threshold: 0.22, rootMargin: "0px 0px -8% 0px" });
-
-    const focusObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        entry.target.classList.toggle("is-active", entry.isIntersecting);
-      });
-    }, { threshold: 0.42 });
-
-    groups.forEach((group) => revealObserver.observe(group));
-    document.querySelectorAll(".section").forEach((section) => focusObserver.observe(section));
-  }
+  });
 
   resizeCanvas();
-  prepareRevealAnimations();
-  loadFrame(0).then((image) => {
-    drawCover(image);
-    drawnFrame = 0;
-    requestRender();
-  }).catch((error) => console.warn(error.message));
+  updateReveal();
+
+  loadFrame(0)
+    .then((image) => {
+      drawCover(image);
+      drawnFrame = 0;
+      requestRender();
+    })
+    .catch((error) => console.warn(error.message));
 
   window.addEventListener("scroll", requestRender, { passive: true });
   window.addEventListener("resize", handleResize, { passive: true });
