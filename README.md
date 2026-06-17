@@ -1,33 +1,38 @@
-# Fontana di Trevi de Serra Negra
+# Patch — Fontana di Trevi de Serra Negra
 
-Landing page estática para a Fontana di Trevi de Serra Negra.
+Correções aplicadas nesta versão:
 
-## Correções desta versão
+- Fundo por sequência de frames em `canvas`, usando os JPGs já existentes no repositório.
+- Scroll recalculado pela altura total da página: topo = primeiro frame, fim = último frame.
+- Remoção de boxes visíveis: seções usam apenas texto, linhas, números e marcadores.
+- Última seção com numeração no mesmo padrão das anteriores.
+- Fade in com foco por scroll, com pequeno delay entre elementos da mesma seção.
+- Elementos visuais sem gradientes, usando cores fixas e transparências sólidas.
+- Responsividade reforçada para desktop, tablet e mobile, com quebra de colunas quando necessário.
 
-- Fundo trocado de vídeo para `canvas` com os JPEGs originais já presentes no repositório.
-- Scroll sincronizado com a página inteira: topo = primeiro frame, fim da página = último frame.
-- Caminho dos frames mantido como `frames fontana/Sequência 01_2000.jpg` até `Sequência 01_2336.jpg`.
-- Boxes visíveis removidos: cards, métricas, lista e chamada visual agora usam apenas texto, linhas, marcadores e detalhes gráficos.
-- Seções continuam com fundo transparente.
-- Layout ajustado para mobile, com melhor escala de títulos, espaçamentos, grid em uma coluna e canvas cobrindo a tela inteira.
-- Header segue removido.
-- Galeria e Melhor horário seguem removidos.
-- Paleta mantida: `#dddddd`, `#42a573`, `#c1503a`, `#000000`.
-- Fontes mantidas: Crimson Text + Oxygen.
-
-## Estrutura principal
+## Arquivos alterados
 
 ```txt
 index.html
 assets/css/styles.css
 assets/js/scroll-frames.js
-frames fontana/
-  Sequência 01_2000.jpg
-  ...
-  Sequência 01_2336.jpg
+README.md
 ```
 
-## Observação
+## Observação sobre frames
 
-O arquivo `assets/js/scroll-video.js` e o MP4 podem permanecer no repositório, mas não são mais chamados pelo `index.html`.
-A versão atual usa `assets/js/scroll-frames.js`.
+O script procura os frames na pasta:
+
+```txt
+frames fontana/
+```
+
+E aceita nomes no formato extraído do repositório, incluindo:
+
+```txt
+Sequ#U00eancia 01_2000.jpg
+...
+Sequ#U00eancia 01_2336.jpg
+```
+
+Também há fallback para nomes com acento real e para `assets/frames/frame-0000.jpg`.

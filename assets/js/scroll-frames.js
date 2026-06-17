@@ -2,233 +2,253 @@
   const canvas = document.getElementById("treviFrameCanvas");
   if (!canvas) return;
 
-  const context = canvas.getContext("2d", { alpha: false });
-  if (!context) return;
+  const ctx = canvas.getContext("2d", { alpha: false, desynchronized: true });
+  const START_FRAME = 2000;
+  const END_FRAME = 2336;
+  const FRAME_COUNT = END_FRAME - START_FRAME + 1;
+  const MAX_CACHE = 44;
+  const PRELOAD_AHEAD = 10;
+  const PRELOAD_BEHIND = 4;
 
-  const FRAME_START = 2000;
-  const FRAME_END = 2336;
-  const FRAME_COUNT = FRAME_END - FRAME_START + 1;
-  const FRAME_FOLDER = "frames fontana";
-  const FRAME_PREFIX = "Sequência 01_";
-  const FRAME_EXTENSION = ".jpg";
+  const state = {
+    dpr: 1,
+    width: 0,
+    height: 0,
+    maxScroll: 1,
+    currentIndex: -1,
+    requestedIndex: 0,
+    ticking: false,
+    resizing: false,
+    lastDrawKey: "",
+    lastLoadedIndex: -1,
+  };
 
-  const cache = new Map();
-  const loading = new Set();
-  const MAX_CACHE_SIZE = 48;
-  const PRELOAD_RADIUS = 8;
+  const frameCache = new Map();
+  const loadingFrames = new Map();
 
-  let currentFrameIndex = -1;
-  let lastDrawnFrameIndex = -1;
-  let currentImage = null;
-  let ticking = false;
-  let canvasWidth = 0;
-  let canvasHeight = 0;
-  let deviceRatio = Math.min(window.devicePixelRatio || 1, 2);
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
 
-  function getFrameUrl(index) {
-    const fileNumber = FRAME_START + index;
-    return encodeURI(`${FRAME_FOLDER}/${FRAME_PREFIX}${fileNumber}${FRAME_EXTENSION}`);
+  function frameNumber(index) {
+    return START_FRAME + clamp(index, 0, FRAME_COUNT - 1);
   }
 
-  function getDocumentHeight() {
-    const body = document.body;
-    const html = document.documentElement;
-
-    return Math.max(
-      body.scrollHeight,
-      body.offsetHeight,
-      html.clientHeight,
-      html.scrollHeight,
-      html.offsetHeight
-    );
+  function frameUrls(index) {
+    const number = frameNumber(index);
+    return [
+      `frames%20fontana/Sequ%C3%AAncia%2001_${number}.jpg`,
+      `frames%20fontana/Sequ%23U00eancia%2001_${number}.jpg`,
+      `frames%20fontana/Sequencia%2001_${number}.jpg`,
+      `assets/frames/frame-${String(index).padStart(4, "0")}.jpg`,
+    ];
   }
 
-  function getPageProgress() {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-    const maxScroll = Math.max(getDocumentHeight() - window.innerHeight, 1);
-    return clamp(scrollTop / maxScroll, 0, 1);
-  }
+  function pruneCache(centerIndex) {
+    if (frameCache.size <= MAX_CACHE) return;
 
-  function getFrameIndexByScroll() {
-    return Math.round(getPageProgress() * (FRAME_COUNT - 1));
-  }
-
-  function trimCache(keepIndex) {
-    if (cache.size <= MAX_CACHE_SIZE) return;
-
-    const ordered = [...cache.keys()].sort((a, b) => {
-      return Math.abs(a - keepIndex) - Math.abs(b - keepIndex);
-    });
-
-    const keep = new Set(ordered.slice(0, MAX_CACHE_SIZE));
-    for (const key of cache.keys()) {
-      if (!keep.has(key)) cache.delete(key);
+    const entries = [...frameCache.keys()].sort((a, b) => Math.abs(b - centerIndex) - Math.abs(a - centerIndex));
+    while (frameCache.size > MAX_CACHE && entries.length) {
+      const key = entries.shift();
+      if (Math.abs(key - centerIndex) > PRELOAD_AHEAD) frameCache.delete(key);
     }
   }
 
-  function loadFrame(index) {
-    if (index < 0 || index >= FRAME_COUNT) return Promise.resolve(null);
-    if (cache.has(index)) return Promise.resolve(cache.get(index));
-    if (loading.has(index)) return Promise.resolve(null);
+  function loadImageFromCandidates(urls) {
+    return new Promise((resolve, reject) => {
+      let cursor = 0;
 
-    loading.add(index);
-
-    return new Promise((resolve) => {
-      const image = new Image();
-      image.decoding = "async";
-      image.loading = "eager";
-
-      image.onload = () => {
-        loading.delete(index);
-        cache.set(index, image);
-        trimCache(index);
-        resolve(image);
-
-        if (index === currentFrameIndex) {
-          currentImage = image;
-          drawFrame(image);
-          lastDrawnFrameIndex = index;
+      function tryNext() {
+        if (cursor >= urls.length) {
+          reject(new Error(`Nenhum arquivo de frame encontrado: ${urls.join(" | ")}`));
+          return;
         }
-      };
 
-      image.onerror = () => {
-        loading.delete(index);
-        console.warn(`Frame não carregado: ${getFrameUrl(index)}`);
-        resolve(null);
-      };
+        const image = new Image();
+        image.decoding = "async";
+        image.onload = () => resolve(image);
+        image.onerror = () => {
+          cursor += 1;
+          tryNext();
+        };
+        image.src = urls[cursor];
+      }
 
-      image.src = getFrameUrl(index);
+      tryNext();
     });
   }
 
-  function preloadNearbyFrames(index) {
-    loadFrame(index);
+  function getFrame(index) {
+    const safeIndex = clamp(index, 0, FRAME_COUNT - 1);
+    if (frameCache.has(safeIndex)) return Promise.resolve(frameCache.get(safeIndex));
+    if (loadingFrames.has(safeIndex)) return loadingFrames.get(safeIndex);
 
-    for (let distance = 1; distance <= PRELOAD_RADIUS; distance += 1) {
-      loadFrame(index + distance);
-      loadFrame(index - distance);
-    }
+    const promise = loadImageFromCandidates(frameUrls(safeIndex))
+      .then((image) => {
+        frameCache.set(safeIndex, image);
+        loadingFrames.delete(safeIndex);
+        state.lastLoadedIndex = safeIndex;
+        pruneCache(safeIndex);
+        return image;
+      })
+      .catch((error) => {
+        loadingFrames.delete(safeIndex);
+        console.warn(error.message);
+        throw error;
+      });
+
+    loadingFrames.set(safeIndex, promise);
+    return promise;
+  }
+
+  function getNearestLoaded(index) {
+    if (frameCache.has(index)) return frameCache.get(index);
+    let nearest = null;
+    let distance = Infinity;
+
+    frameCache.forEach((image, key) => {
+      const currentDistance = Math.abs(key - index);
+      if (currentDistance < distance) {
+        nearest = image;
+        distance = currentDistance;
+      }
+    });
+
+    return nearest;
   }
 
   function resizeCanvas() {
-    const width = Math.max(window.innerWidth, 1);
-    const height = Math.max(window.innerHeight, 1);
-    const nextRatio = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    const width = Math.max(1, Math.round(rect.width * dpr));
+    const height = Math.max(1, Math.round(rect.height * dpr));
 
-    if (width === canvasWidth && height === canvasHeight && nextRatio === deviceRatio) {
-      return;
-    }
-
-    canvasWidth = width;
-    canvasHeight = height;
-    deviceRatio = nextRatio;
-
-    canvas.width = Math.round(width * deviceRatio);
-    canvas.height = Math.round(height * deviceRatio);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-
-    context.setTransform(deviceRatio, 0, 0, deviceRatio, 0, 0);
-
-    if (currentImage) {
-      drawFrame(currentImage);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+      state.width = width;
+      state.height = height;
+      state.dpr = dpr;
+      state.lastDrawKey = "";
     }
   }
 
-  function drawFrame(image) {
-    if (!image || !canvasWidth || !canvasHeight) return;
+  function updateScrollBounds() {
+    const doc = document.documentElement;
+    state.maxScroll = Math.max(doc.scrollHeight - window.innerHeight, 1);
+  }
 
-    const imageRatio = image.naturalWidth / image.naturalHeight;
-    const canvasRatio = canvasWidth / canvasHeight;
+  function getScrollIndex() {
+    if (prefersReducedMotion) return 0;
+    const progress = clamp((window.scrollY || docScrollTop()) / state.maxScroll, 0, 1);
+    return Math.round(progress * (FRAME_COUNT - 1));
+  }
 
-    let drawWidth;
-    let drawHeight;
-    let offsetX;
-    let offsetY;
+  function docScrollTop() {
+    return document.documentElement.scrollTop || document.body.scrollTop || 0;
+  }
+
+  function drawCover(image, index) {
+    if (!image || !state.width || !state.height) return;
+
+    const key = `${index}:${state.width}x${state.height}`;
+    if (state.lastDrawKey === key) return;
+
+    const imageWidth = image.naturalWidth || image.width;
+    const imageHeight = image.naturalHeight || image.height;
+    const canvasRatio = state.width / state.height;
+    const imageRatio = imageWidth / imageHeight;
+
+    let drawWidth = state.width;
+    let drawHeight = state.height;
+    let dx = 0;
+    let dy = 0;
 
     if (imageRatio > canvasRatio) {
-      drawHeight = canvasHeight;
+      drawHeight = state.height;
       drawWidth = drawHeight * imageRatio;
-      offsetX = (canvasWidth - drawWidth) / 2;
-      offsetY = 0;
+      dx = (state.width - drawWidth) / 2;
     } else {
-      drawWidth = canvasWidth;
+      drawWidth = state.width;
       drawHeight = drawWidth / imageRatio;
-      offsetX = 0;
-      offsetY = (canvasHeight - drawHeight) / 2;
+      dy = (state.height - drawHeight) / 2;
     }
 
-    context.fillStyle = "#000000";
-    context.fillRect(0, 0, canvasWidth, canvasHeight);
-    context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+    ctx.clearRect(0, 0, state.width, state.height);
+    ctx.drawImage(image, dx, dy, drawWidth, drawHeight);
+    state.lastDrawKey = key;
   }
 
-  function renderByScroll() {
-    ticking = false;
+  function preloadAround(index) {
+    const start = clamp(index - PRELOAD_BEHIND, 0, FRAME_COUNT - 1);
+    const end = clamp(index + PRELOAD_AHEAD, 0, FRAME_COUNT - 1);
+
+    for (let i = start; i <= end; i += 1) {
+      if (!frameCache.has(i) && !loadingFrames.has(i)) getFrame(i).catch(() => {});
+    }
+  }
+
+  function render() {
+    state.ticking = false;
     resizeCanvas();
+    updateScrollBounds();
 
-    const nextFrameIndex = getFrameIndexByScroll();
-    currentFrameIndex = nextFrameIndex;
+    const index = getScrollIndex();
+    state.requestedIndex = index;
+    preloadAround(index);
 
-    if (nextFrameIndex === lastDrawnFrameIndex) {
-      preloadNearbyFrames(nextFrameIndex);
-      return;
-    }
+    const loadedImage = getNearestLoaded(index);
+    if (loadedImage) drawCover(loadedImage, index);
 
-    const cachedImage = cache.get(nextFrameIndex);
-
-    if (cachedImage) {
-      currentImage = cachedImage;
-      drawFrame(cachedImage);
-      lastDrawnFrameIndex = nextFrameIndex;
-    } else {
-      loadFrame(nextFrameIndex);
-    }
-
-    preloadNearbyFrames(nextFrameIndex);
+    getFrame(index)
+      .then((image) => {
+        if (state.requestedIndex === index) drawCover(image, index);
+      })
+      .catch(() => {});
   }
 
   function requestRender() {
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(renderByScroll);
+    if (state.ticking) return;
+    state.ticking = true;
+    window.requestAnimationFrame(render);
   }
 
-  function boot() {
-    resizeCanvas();
+  function setupReveal() {
+    const sections = [...document.querySelectorAll(".section-focus")];
 
-    const firstFrame = getFrameIndexByScroll();
-    currentFrameIndex = firstFrame;
-
-    loadFrame(firstFrame).then((image) => {
-      if (image && !currentImage) {
-        currentImage = image;
-        drawFrame(image);
-        lastDrawnFrameIndex = firstFrame;
-      }
-      preloadNearbyFrames(firstFrame);
+    sections.forEach((section) => {
+      section.querySelectorAll(".reveal-item").forEach((item, index) => {
+        item.style.setProperty("--reveal-delay", `${Math.min(index * 95, 560)}ms`);
+      });
     });
 
-    requestRender();
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle("is-focused", entry.isIntersecting);
+      });
+    }, {
+      threshold: 0.38,
+      rootMargin: "-12% 0px -18% 0px",
+    });
+
+    sections.forEach((section) => observer.observe(section));
   }
 
   window.addEventListener("scroll", requestRender, { passive: true });
-  window.addEventListener("resize", requestRender);
-  window.addEventListener("orientationchange", requestRender);
-  window.addEventListener("load", requestRender);
+  window.addEventListener("resize", () => {
+    state.lastDrawKey = "";
+    requestRender();
+  }, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    state.lastDrawKey = "";
+    setTimeout(requestRender, 160);
+  }, { passive: true });
 
-  if ("ResizeObserver" in window) {
-    const resizeObserver = new ResizeObserver(requestRender);
-    resizeObserver.observe(document.body);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot, { once: true });
-  } else {
-    boot();
-  }
+  setupReveal();
+  updateScrollBounds();
+  resizeCanvas();
+  getFrame(0).then((image) => drawCover(image, 0)).catch(() => {});
+  requestRender();
 })();
