@@ -11,16 +11,9 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-  <div class="page-video-stage" aria-hidden="true">
-    <video
-      id="treviScrollVideo"
-      class="page-scroll-video"
-      src="assets/video/trevi-scroll-bg.mp4"
-      muted
-      playsinline
-      preload="auto"
-    ></video>
-    <div class="page-video-overlay"></div>
+  <div class="frame-background" aria-hidden="true">
+    <canvas id="treviFrameCanvas" class="frame-background__canvas"></canvas>
+    <div class="frame-background__overlay"></div>
   </div>
 
   <main>
@@ -31,7 +24,7 @@
         <p>
           Um pedacinho de Roma no interior paulista. Uma réplica monumental, fotogênica e cheia de charme no coração turístico da cidade.
         </p>
-        <div class="hero-actions">
+        <div class="hero-actions" aria-label="Ações principais">
           <a class="button primary" href="#sobre">Conheça a atração</a>
           <a class="button ghost" href="#localizacao">Como chegar</a>
         </div>
@@ -61,20 +54,20 @@
         <div class="section-number">02</div>
         <span class="section-kicker">Destaques</span>
         <h2>Por que visitar a Fontana di Trevi de Serra Negra?</h2>
-        <div class="cards-grid">
-          <article class="card">
+        <div class="cards-grid text-grid">
+          <article class="text-card">
             <h3>Maior réplica do mundo</h3>
             <p>A atração é apresentada como a maior réplica da Fontana di Trevi, com cerca de 40% do tamanho da fonte original.</p>
           </article>
-          <article class="card">
+          <article class="text-card">
             <h3>Localização central</h3>
             <p>Fica próxima à Praça João Zelante, à Fonte dos Italianos e a outros pontos de circulação turística.</p>
           </article>
-          <article class="card">
+          <article class="text-card">
             <h3>Cenário perfeito para fotos</h3>
             <p>A fachada monumental, as esculturas, o espelho d’água e a iluminação tornam o local muito fotogênico.</p>
           </article>
-          <article class="card">
+          <article class="text-card">
             <h3>Experiência noturna</h3>
             <p>À noite, a iluminação valoriza os detalhes da obra e cria um clima especial para visitantes.</p>
           </article>
@@ -87,7 +80,7 @@
         <div class="section-number">03</div>
         <span class="section-kicker">Características</span>
         <h2>Detalhes que impressionam</h2>
-        <div class="metrics-grid">
+        <div class="metrics-grid visual-list">
           <div class="metric"><strong>370 m²</strong><span>Área aproximada</span></div>
           <div class="metric"><strong>11 m</strong><span>Altura aproximada</span></div>
           <div class="metric"><strong>20,70 m</strong><span>Largura da estrutura</span></div>
@@ -100,7 +93,7 @@
     <section class="section experience">
       <div class="container split reverse numbered-section">
         <div class="section-number">04</div>
-        <div class="feature-box">
+        <div class="feature-quote">
           <span>Experiência</span>
           <p>Um passeio rápido, bonito e memorável para incluir no roteiro pelo centro de Serra Negra.</p>
         </div>
@@ -155,6 +148,6 @@
     <p>Landing page turística — Fontana di Trevi de Serra Negra</p>
   </footer>
 
-  <script src="assets/js/scroll-video.js"></script>
+  <script src="assets/js/scroll-frames.js"></script>
 </body>
 </html>

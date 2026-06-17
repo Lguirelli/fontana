@@ -2,38 +2,32 @@
 
 Landing page estática para a Fontana di Trevi de Serra Negra.
 
-## Alterações desta versão
+## Correções desta versão
 
-- Header removido.
-- Seção Galeria removida.
-- Seção Melhor horário removida.
-- Combinação de fontes atualizada para Crimson Text + Oxygen.
-- Vídeo de fundo fixo em tela cheia durante toda a página.
-- Scroll recalculado com base na altura total do documento.
-- Início do scroll corresponde ao início do vídeo.
-- Fim do scroll corresponde ao fim do vídeo.
-- Seções com fundo transparente para deixar o vídeo sempre visível.
+- Fundo trocado de vídeo para `canvas` com os JPEGs originais já presentes no repositório.
+- Scroll sincronizado com a página inteira: topo = primeiro frame, fim da página = último frame.
+- Caminho dos frames mantido como `frames fontana/Sequência 01_2000.jpg` até `Sequência 01_2336.jpg`.
+- Boxes visíveis removidos: cards, métricas, lista e chamada visual agora usam apenas texto, linhas, marcadores e detalhes gráficos.
+- Seções continuam com fundo transparente.
+- Layout ajustado para mobile, com melhor escala de títulos, espaçamentos, grid em uma coluna e canvas cobrindo a tela inteira.
+- Header segue removido.
+- Galeria e Melhor horário seguem removidos.
+- Paleta mantida: `#dddddd`, `#42a573`, `#c1503a`, `#000000`.
+- Fontes mantidas: Crimson Text + Oxygen.
 
-## Estrutura
+## Estrutura principal
 
 ```txt
 index.html
 assets/css/styles.css
-assets/js/scroll-video.js
-assets/video/trevi-scroll-bg.mp4
-README.md
+assets/js/scroll-frames.js
+frames fontana/
+  Sequência 01_2000.jpg
+  ...
+  Sequência 01_2336.jpg
 ```
 
-## Como usar
+## Observação
 
-Abra o `index.html` no navegador ou publique a pasta no GitHub Pages, Vercel ou hospedagem estática.
-
-Não usa npm, Vite ou build.
-
-
-## Paleta aplicada
-
-- `#dddddd` para textos principais e linhas claras.
-- `#42a573` como destaque verde e CTA principal.
-- `#c1503a` como destaque quente em números, marcadores e hover.
-- `#000000` como base escura do fundo.
+O arquivo `assets/js/scroll-video.js` e o MP4 podem permanecer no repositório, mas não são mais chamados pelo `index.html`.
+A versão atual usa `assets/js/scroll-frames.js`.
