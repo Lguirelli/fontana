@@ -1,28 +1,32 @@
-# Fontana di Trevi de Serra Negra
+# Patch Fontana di Trevi — ajustes de texto, mobile e layout
 
-Patch de correção para a landing page com sequência de frames no scroll.
+Este patch corrige a versão com frames JPEG no canvas, mantendo a pasta de frames existente no repositório.
 
-## O que foi corrigido
+## Arquivos alterados
 
-- O fundo voltou a usar `canvas`, sem depender de vídeo.
-- O frame agora é desenhado com comportamento de `cover`, sem distorcer a proporção.
-- O progresso do fundo é calculado do topo ao fim real da página.
-- O script continua no caminho `assets/js/scroll-video.js` para evitar quebra de link antigo.
-- As seções ficam transparentes, sem boxes visíveis.
-- Textos têm fade in com pequeno delay entre elementos.
-- As colunas quebram melhor em telas menores.
-- O canvas recalcula o tamanho no resize e orientation change.
+- `index.html`
+- `assets/css/styles.css`
+- `assets/js/scroll-video.js`
+- `README.md`
 
-## Estrutura esperada dos frames
+## Ajustes aplicados
+
+- Removido o botão `Abrir no mapa` da seção de localização.
+- Métricas ajustadas com espaços não quebráveis para evitar números divididos, como `370 m²`, `11 m` e `20,70 m`.
+- Títulos e textos com regras para evitar quebras ruins em desktop, tablet e mobile.
+- Mobile centralizado: números, títulos, textos, linhas e elementos visuais ficam alinhados ao centro da tela.
+- Seções em duas colunas com o corpo do texto alinhado no topo do conteúdo, não pela marcação lateral da seção.
+- Colunas quebram automaticamente quando a largura não comporta o layout.
+- Mantido o canvas de fundo com proporção `cover` e scroll sincronizado com a página inteira.
+
+## Observação
 
 A pasta de frames deve continuar na raiz do projeto:
 
 ```txt
 frames fontana/
-├─ Sequ#U00eancia 01_2000.jpg
-├─ Sequ#U00eancia 01_2001.jpg
+├─ Sequência 01_2000.jpg
+├─ Sequência 01_2001.jpg
 ├─ ...
-└─ Sequ#U00eancia 01_2336.jpg
+└─ Sequência 01_2336.jpg
 ```
-
-O script também tenta carregar a variação com acento real no nome (`Sequência 01_2000.jpg`) caso o repositório tenha sido corrigido manualmente.
