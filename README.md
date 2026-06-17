@@ -1,38 +1,51 @@
-# Fontana di Trevi — background em sequência no scroll
+# Fontana di Trevi de Serra Negra
 
-Este pacote usa as imagens enviadas como um vídeo MP4 de 24 fps e controla o `currentTime` pelo scroll. Essa abordagem é mais leve e estável do que carregar 337 imagens diretamente no navegador.
+Landing page estática com fundo animado controlado pelo scroll.
 
-## Arquivos
+## Estrutura
 
-- `assets/video/trevi-scroll-bg.mp4` — sequência renderizada em 24 fps a partir dos frames enviados.
-- `trevi-scroll-section.html` — seção HTML pronta.
-- `trevi-scroll.css` — CSS para vídeo fixo no fundo e conteúdo por cima.
-- `trevi-scroll.js` — JS que sincroniza o vídeo com o scroll.
-
-## Como instalar
-
-1. Copie `assets/video/trevi-scroll-bg.mp4` para o projeto.
-2. Cole o conteúdo de `trevi-scroll-section.html` no `index.html`.
-3. Importe o CSS no `<head>`:
-
-```html
-<link rel="stylesheet" href="trevi-scroll.css">
+```txt
+index.html
+assets/
+  css/styles.css
+  js/scroll-video.js
+  video/trevi-scroll-bg.mp4
 ```
 
-4. Importe o JS antes de `</body>`:
+## Como rodar localmente
 
-```html
-<script src="trevi-scroll.js" defer></script>
+Abra o `index.html` no navegador.
+
+Para uma simulação mais próxima do deploy, rode um servidor local simples:
+
+```bash
+python -m http.server 8000
 ```
 
-## Ajuste de velocidade do scroll
+Depois acesse:
 
-A duração visual depende da altura da seção:
-
-```css
-.trevi-scroll {
-  min-height: 560vh;
-}
+```txt
+http://localhost:8000
 ```
 
-Aumente para deixar a sequência mais lenta. Diminua para deixar mais rápida.
+## Como publicar
+
+### GitHub Pages
+
+1. Suba todos os arquivos para um repositório.
+2. Vá em Settings > Pages.
+3. Em Branch, selecione `main` e `/root`.
+4. Salve.
+
+### Vercel
+
+1. Importe o repositório na Vercel.
+2. Framework Preset: `Other`.
+3. Build Command: deixe vazio.
+4. Output Directory: deixe vazio ou `.`.
+
+## Observações
+
+- O vídeo de fundo fica em `assets/video/trevi-scroll-bg.mp4`.
+- O JS sincroniza o tempo do vídeo com o scroll usando 24 fps.
+- Não usa npm, Vite ou build.
