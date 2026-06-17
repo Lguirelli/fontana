@@ -1,29 +1,19 @@
-# Patch final — Fontana di Trevi Serra Negra
+Patch de correção — Fontana di Trevi de Serra Negra
 
-Substitua estes arquivos no repositório atual:
+Arquivos incluídos:
+- index.html
+- assets/css/styles.css
+- assets/js/scroll-video.js
+- assets/js/scroll-frames.js
+- assets/frames-optimized/*.webp
 
-- `index.html`
-- `assets/css/styles.css`
-- `assets/js/scroll-video.js`
-- `assets/js/scroll-frames.js`
+Principais ajustes:
+- alternância de lado aplicada à seção completa, não apenas às colunas internas;
+- numeração mantida sempre à esquerda;
+- fade in controlado por scroll e finalizando quando a seção atinge o centro da viewport;
+- scroll do fundo recalculado conforme o tamanho real da página;
+- frames otimizados em WebP para reduzir lag;
+- fallback para os JPGs originais caso algum arquivo otimizado não seja encontrado.
 
-Os frames não estão incluídos no patch. A pasta esperada continua sendo:
 
-```txt
-frames fontana/
-├─ Sequência 01_2000.jpg
-├─ Sequência 01_2001.jpg
-└─ ... até Sequência 01_2336.jpg
-```
-
-Correções aplicadas:
-
-- textos maiores e mais próximos do modelo editorial anterior;
-- distância menor entre seções;
-- seções alternando lado do texto em layout desktop;
-- numeração mantida sempre à esquerda no desktop;
-- botão de mapa restaurado de forma discreta;
-- scroll do canvas recalculado pelo tamanho real da página;
-- carregamento de frames corrigido para a pasta `frames fontana`;
-- fade in por scroll funcionando sem depender de IntersectionObserver;
-- mobile centralizado e com numeração alinhada.
+Observação: os frames otimizados estão em meia cadência (1 a cada 2 frames originais) para reduzir lag de scroll sem perder a leitura visual da sequência.
