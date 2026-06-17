@@ -29,3 +29,11 @@ README.md
 Abra o `index.html` no navegador ou publique a pasta no GitHub Pages, Vercel ou hospedagem estática.
 
 Não usa npm, Vite ou build.
+
+
+## Paleta aplicada
+
+- `#dddddd` para textos principais e linhas claras.
+- `#42a573` como destaque verde e CTA principal.
+- `#c1503a` como destaque quente em números, marcadores e hover.
+- `#000000` como base escura do fundo.
