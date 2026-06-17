@@ -1,38 +1,28 @@
-# Patch — Fontana di Trevi de Serra Negra
+# Fontana di Trevi de Serra Negra
 
-Correções aplicadas nesta versão:
+Patch de correção para a landing page com sequência de frames no scroll.
 
-- Fundo por sequência de frames em `canvas`, usando os JPGs já existentes no repositório.
-- Scroll recalculado pela altura total da página: topo = primeiro frame, fim = último frame.
-- Remoção de boxes visíveis: seções usam apenas texto, linhas, números e marcadores.
-- Última seção com numeração no mesmo padrão das anteriores.
-- Fade in com foco por scroll, com pequeno delay entre elementos da mesma seção.
-- Elementos visuais sem gradientes, usando cores fixas e transparências sólidas.
-- Responsividade reforçada para desktop, tablet e mobile, com quebra de colunas quando necessário.
+## O que foi corrigido
 
-## Arquivos alterados
+- O fundo voltou a usar `canvas`, sem depender de vídeo.
+- O frame agora é desenhado com comportamento de `cover`, sem distorcer a proporção.
+- O progresso do fundo é calculado do topo ao fim real da página.
+- O script continua no caminho `assets/js/scroll-video.js` para evitar quebra de link antigo.
+- As seções ficam transparentes, sem boxes visíveis.
+- Textos têm fade in com pequeno delay entre elementos.
+- As colunas quebram melhor em telas menores.
+- O canvas recalcula o tamanho no resize e orientation change.
 
-```txt
-index.html
-assets/css/styles.css
-assets/js/scroll-frames.js
-README.md
-```
+## Estrutura esperada dos frames
 
-## Observação sobre frames
-
-O script procura os frames na pasta:
+A pasta de frames deve continuar na raiz do projeto:
 
 ```txt
 frames fontana/
+├─ Sequ#U00eancia 01_2000.jpg
+├─ Sequ#U00eancia 01_2001.jpg
+├─ ...
+└─ Sequ#U00eancia 01_2336.jpg
 ```
 
-E aceita nomes no formato extraído do repositório, incluindo:
-
-```txt
-Sequ#U00eancia 01_2000.jpg
-...
-Sequ#U00eancia 01_2336.jpg
-```
-
-Também há fallback para nomes com acento real e para `assets/frames/frame-0000.jpg`.
+O script também tenta carregar a variação com acento real no nome (`Sequência 01_2000.jpg`) caso o repositório tenha sido corrigido manualmente.
