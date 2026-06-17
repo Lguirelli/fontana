@@ -1,10 +1,11 @@
+
 const canvas=document.getElementById('bg');
 const ctx=canvas.getContext('2d');
 
 let w,h;
 function resize(){
-w=canvas.width=window.innerWidth;
-h=canvas.height=window.innerHeight;
+w=canvas.width=innerWidth;
+h=canvas.height=innerHeight;
 }
 window.addEventListener('resize',resize);
 resize();
@@ -31,16 +32,16 @@ ctx.drawImage(img,x,y,img.width*scale,img.height*scale);
 }
 
 window.addEventListener('scroll',()=>{
-const max=document.body.scrollHeight-window.innerHeight;
+const max=document.body.scrollHeight-innerHeight;
 const p=window.scrollY/max;
 draw(Math.floor(p*total));
 });
 
 const els=document.querySelectorAll('.reveal');
 window.addEventListener('scroll',()=>{
-els.forEach(el=>{
-if(el.getBoundingClientRect().top<window.innerHeight*0.85){
-el.classList.add('active');
+els.forEach(e=>{
+if(e.getBoundingClientRect().top<innerHeight*0.85){
+e.classList.add('active');
 }
 });
 });
